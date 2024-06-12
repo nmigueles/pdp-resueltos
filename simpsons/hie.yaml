@@ -1,0 +1,7 @@
+cradle:
+  stack:
+    - path: "./src"
+      component: "simpsons:lib"
+
+    - path: "./test"
+      component: "simpsons:test:simpsons-test"

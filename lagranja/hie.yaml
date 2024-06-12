@@ -1,0 +1,7 @@
+cradle:
+  stack:
+    - path: "./src"
+      component: "lagranja:lib"
+
+    - path: "./test"
+      component: "lagranja:test:lagranja-test"
