@@ -1,0 +1,7 @@
+cradle:
+  stack:
+    - path: "./src"
+      component: "escuelita-de-tanos:lib"
+
+    - path: "./test"
+      component: "escuelita-de-tanos:test:escuelita-de-tanos-test"

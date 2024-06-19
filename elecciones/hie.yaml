@@ -1,0 +1,7 @@
+cradle:
+  stack:
+    - path: "./src"
+      component: "elecciones:lib"
+
+    - path: "./test"
+      component: "elecciones:test:elecciones-test"
