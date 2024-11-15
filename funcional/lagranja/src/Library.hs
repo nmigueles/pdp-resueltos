@@ -43,22 +43,20 @@ modificarPeso delta animal =
 engorde :: Number -> Actividad
 engorde kilos = modificarPeso ((min 5 . (/) 2) kilos)
 
--- Que pasa si no esta enfermo, no necesita revisacion medica, entonces se lo tengo que pasar por parametro?
--- Esto no me gusta
 revisacionMedica :: VisitaMedica -> Actividad
-revisacionMedica visitaMedica animal 
-  | enfermo animal = (engorde 2 animal) { 
+revisacionMedica visitaMedica animal
+  | enfermo animal = engorde 2 animal {
       historialMedico = ((++) [visitaMedica] . historialMedico) animal
   }
   | otherwise = animal
 
 festejarCumpleanios :: Actividad
-festejarCumpleanios animal = modificarPeso (-1) animal { 
+festejarCumpleanios animal = modificarPeso (-1) animal {
   edad = ((+) 1 . edad) animal
 }
 
 chequeoDePeso :: Number -> Actividad
-chequeoDePeso pesoLimite animal = animal { 
+chequeoDePeso pesoLimite animal = animal {
   enfermo = ((<=) pesoLimite . peso) animal
 }
 
@@ -67,18 +65,10 @@ proceso actividades animal = foldr ($) animal actividades
 
 -- Ejemplos
 procesoEjemplo :: Animal
-procesoEjemplo =
-  proceso
-    [ engorde 5,
-      festejarCumpleanios,
-      chequeoDePeso 10,
-      revisacionMedica (VisitaMedica {
-        diasDeRecuperacion = 30, 
-        costo = 200
-      })
-    ]
-    Animal
-      { nombre = "Gachi",
+procesoEjemplo = proceso 
+    [engorde 5, festejarCumpleanios, chequeoDePeso 10, revisacionMedica (VisitaMedica { diasDeRecuperacion = 30, costo = 200 })]
+    Animal { 
+        nombre = "Gachi",
         tipo = "Vaca",
         peso = 5,
         edad = 5,
@@ -87,9 +77,9 @@ procesoEjemplo =
       }
 
 elPesoSubeDeFormaControlada :: Actividad -> Animal -> Bool
-elPesoSubeDeFormaControlada actividad animal = 
+elPesoSubeDeFormaControlada actividad animal =
   -- La actividad debe mejorar el peso del animal
-  ((peso . actividad) animal >= peso animal) && 
+  ((peso . actividad) animal >= peso animal) &&
     -- La actividad no debe hacer que el peso suba mas de 3 kilos
   ((peso . actividad) animal  - peso animal) <= 3
 
