@@ -1,5 +1,5 @@
 class Lugar {
-  const nombre
+  const property nombre
 
   method tieneNombrePar() = nombre.length().even()
 
@@ -27,7 +27,6 @@ class Ciudad inherits Lugar {
 }
 
 class Pueblo inherits Lugar {
-  const extensionTerritorial
   const anioDeFundacion
   const provincia
 
@@ -55,14 +54,10 @@ class Balneario inherits Lugar {
 // Personas
 
 class Persona {
-  const preferencia = new Preferencia()
+  const preferencia
   const presuepuestoMaximo
 
   method iriaALugar(lugar) = preferencia.iriaALugar(lugar)
-
-  method agregarPreferencia(_preferencia) = preferencia.agregarPreferencia(_preferencia)
-
-  method removerPreferencia(_preferencia) = preferencia.removerPreferencia(_preferencia)  
 
   method reiniciarPreferencias() = preferencia.reiniciarPreferencias()
 
@@ -70,7 +65,7 @@ class Persona {
 }
 
 // Composite
-class Preferencia { 
+class CombinacionDePreferencias { 
   const preferencias = #{}
 
   method agregarPreferencia(preferencia) = preferencias.add(preferencia)
@@ -99,19 +94,20 @@ object _calendario { // Stub
 }
 
 class Tour {
-  const calendario = _calendario
-  const fechaDeSalida
-  const cantidadDePersonasRequeridas
-  const ciudadesARecorrer
   const precio
+  const fechaDeSalida
+  const calendario = _calendario
+  const cantidadDePersonasRequeridas
+  const ciudadesARecorrer = []
 
   const personas = #{}
 
   method confirmado() = self.tourCompleto()
 
   method agregarPersona(persona) {
+    self.validarPago(persona)
+    self.validarPreferencia(persona)
     self.hayEspacio()
-    self.adecuadoParaPersona(persona) 
     personas.add(persona)
   }
 
@@ -125,15 +121,19 @@ class Tour {
     }
   }
 
-  method adecuadoParaPersona(persona) {
-    if (!persona.puedePagar(precio)) {
-      throw new DomainException(message = "El monto del tour no es adecuado para la persona")
-    }
-
-    if (!ciudadesARecorrer.all({ ciudad => persona.iriaALugar(ciudad) })) {
+  method validarPreferencia(persona) {
+    if (!self.quiereIrATodosLosLugares(persona)) {
       throw new DomainException(message = "Hay lugares que no son adecuados para la persona")
     }
   }
+
+  method validarPago(persona) {
+    if (!persona.puedePagar(precio)) {
+      throw new DomainException(message = "El monto del tour no es adecuado para la persona")
+    }
+  }
+
+  method quiereIrATodosLosLugares(persona) = ciudadesARecorrer.all({ ciudad => persona.iriaALugar(ciudad) })
 
   method saleEsteAnio() = fechaDeSalida.year() == calendario.hoy().year()
 
@@ -141,11 +141,13 @@ class Tour {
 }
 
 object reporte {
-  method toursPendientesDeConfirmacion(tours) = tours.find({ tour => !tour.confirmado() })
+  const tours = [] // Fuente de verdad de los tours
 
-  method totalDeToursQueSalenEsteAnio(tours) = self.toursQueSalenEsteAnio(tours).sum({
+  method toursPendientesDeConfirmacion() = tours.filter({ tour => !tour.confirmado() })
+
+  method totalDeToursQueSalenEsteAnio() = self.toursQueSalenEsteAnio().sum({
     tour => tour.recaudacionTotal()
   })
 
-  method toursQueSalenEsteAnio(tours) = tours.filter({ tour => tour.saleEsteAnio() })
+  method toursQueSalenEsteAnio() = tours.filter({ tour => tour.saleEsteAnio() })
 }
